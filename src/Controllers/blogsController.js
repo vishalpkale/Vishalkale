@@ -120,11 +120,11 @@ const updateBlog = async function (req, res) {
      let subcategory = req.body.subcategory
     let blogId = req.params.blogId
    
-    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
-    if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
-    if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
-    if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
-    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
+    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
+    if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
+    if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
+    if (!tags) { res.status(400).send({ status: false, msg: "tags should be present" }) }
+    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
     // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
 
 
