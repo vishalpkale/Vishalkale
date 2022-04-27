@@ -12,6 +12,7 @@ router.post("/Blogs",blogsController.createBlog)
 //getBlogs
 router.get("/blogs", blogsController.getBlog)
 
+router.delete("/Blogs/:BlogId",blogsController.deleteblog)
 
 router.delete("/blogs?queryparams",blogsController.deleteblog)
 
