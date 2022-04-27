@@ -3,9 +3,9 @@ const authorModel = require("../Models/authorModel")
 
 const createAuthor = async function (req,res) {
 try {
-   if (Object.key.length != 0){ 
     let data = req.body;
-    let author = await authorModel(data)
+   if (Object.keys(data).length != 0){ 
+    let author = await authorModel.create(data)
     res.status(201).send({status: true, data: author})
 }
     else{
