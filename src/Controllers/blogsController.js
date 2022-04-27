@@ -62,8 +62,54 @@ const createBlog = async function (req, res) {
   }
 }
 
-/////////////////////////////////////////Update Api/////////////////////////////////////////////////
+const getBlog = async function (req, res) {
+  try {
+    let blogs = await blogsModel.find()
+    let blog = []
+    for (let i = 0; i < blogs.length; i++) {
+      if (!blogs[i].isDeleted && blogs[i].isPublished) {
+        blog.push(blogs[i])
+      }
+    }
+    if (blog.length === 0) {
+      res.status(404).send({ msg: "no data" })
+      return;
+    }
+    let id = req.query
+    let filtered = [];
+    filtered = blog.filter((item) => {
+      if (Object.keys(id).length === 0) {
+        return true;
+      }
+      else {
+        return getConditions(id, item)
+      }
+    })
+    if (filtered.length === 0) {
+      res.status(404).send({ msg: "no data" })
+      return;
+    }
+    res.status(200).send({ status: true, count: filtered.length, data: filtered })
+  }
+  catch (err) {
+    res.status(500).send({ data: err.message })
+  }
+}
 
+const getConditions = (obj, item) => {
+  const arr = Object.keys(obj);
+  let condition = true;
+  for (let key of arr) {
+    if (Array.isArray(item[key])) {
+      condition = condition && (item[key].includes(obj[key]))
+    } else {
+      condition = condition && (obj[key] == item[key])
+    }
+  }
+  return condition;
+}
+
+//////////////////// Update Api ///////////////////////////////////////////
 const updateBlog = async function (req, res) {
   try {
      let title = req.body.title
@@ -150,5 +196,6 @@ let deletedByQueryParams = async function (req, res) {
 module.exports.createBlog = createBlog
 module.exports.deleteblog = deleteblog
 module.exports.deletedByQueryParams = deletedByQueryParams
+module.exports.getBlog = getBlog
 module.exports.updateBlog = updateBlog
 
