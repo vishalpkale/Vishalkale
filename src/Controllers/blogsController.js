@@ -1,6 +1,9 @@
 const mongoose = require('mongoose')
 const authorModel = require('../Models/authorModel')
 const blogsModel = require('../Models/blogsModel')
+const date = new Date();
+const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
+
 
 const createBlog = async function (req, res) {
   try {
@@ -104,7 +107,49 @@ let deletedByQueryParams = async function (req, res) {
 };
 
 
+
+//////////////////// Update Api ///////////////////////////////////////////
+
+
+
+const updateBlog = async function (req, res) {
+  try {
+     let title = req.body.title
+     let body = req.body.body
+     let tags = req.body.tags
+     let subcategory = req.body.subcategory
+    let blogId = req.params.blogId
+   
+    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
+    if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
+    if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
+    if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
+    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
+    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
+
+
+    const chkid = await blogsModel.findById({"_id": blogId })
+    if (!chkid) {
+      res.status(400).send({ status: false, msg: "blog isn't available please check blog Id" })
+    }
+    if(chkid.isDeleted==true)
+    {
+      res.status(400).send({status:false,msg:"The document is deleted"})
+    }
+    const updatblog = await blogsModel.updateOne(
+      { "_id": blogId },
+      { $set:{ "title": title , "body": body, "tags": tags ,"subcategory": subcategory , "isPublished": true, "publishedAt": dateStr }},
+      { new: true })
+    res.status(201).send({ Status: true, msg: updatblog })
+  }
+catch(err) {
+    res.status(500).send({ msg: err.message })
+  }
+}
+
+
 module.exports.createBlog = createBlog
 module.exports.deleteblog = deleteblog
 module.exports.deletedByQueryParams = deletedByQueryParams
+module.exports.updateBlog = updateBlog
 
