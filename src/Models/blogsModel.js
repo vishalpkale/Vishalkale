@@ -1,5 +1,5 @@
 const {default: mongoose} = require("mongoose");
-const ObjectId = mongoose.Schema.types.ObjectId
+const ObjectId = mongoose.Schema.Types.ObjectId
 const date = new Date();
 const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
 
@@ -32,7 +32,7 @@ const blogSchema = new mongoose.Schema ({
         default: dateStr 
     }, 
     isDeleted: {
-        type: boolean, 
+        type: Boolean, 
         default: false
     },
     publishedAt: {
@@ -40,10 +40,9 @@ const blogSchema = new mongoose.Schema ({
         default: dateStr 
     }, 
     isPublished: {
-        type: boolean, 
+        type: Boolean, 
         default: false}
         
 }, {timestamps:true})
-
 
 module.exports = mongoose.model('Blog', blogSchema)
