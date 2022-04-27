@@ -8,10 +8,10 @@ try {
         return res.status(400).send({ status: false, data: "required(*) fields are mandatory to fill" })
     }
     
-    // let emailValidation = await authorModel.findOne({ email : email })
-    // if (!emailValidation) {
-    //     return res.status(409).send({ status: false, data: "This Email has been registered already" })
-    // }
+    let emailValidation = await authorModel.findOne({ email : email })
+    if (emailValidation) {
+        return res.status(409).send({ status: false, data: "This Email has been registered already" })
+    }
 
     let data = await authorModel.create(req.body)
     console.log({ status: "successfully created", msg: data })

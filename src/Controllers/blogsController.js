@@ -4,6 +4,7 @@ const blogsModel = require('../Models/blogsModel')
 const date = new Date();
 const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
 
+///////////////////////////////////////////////createBlogs//////////////////////////////////////////////////////////////
 
 const createBlog = async function (req, res) {
   try {
@@ -16,8 +17,7 @@ const createBlog = async function (req, res) {
     }
 
     //Extract params
-    const { title, body, authorId, tags, category } =
-      requestBody;
+    const { title, body, authorId, tags, category } = requestBody;
 
     // Validation starts
     if (!title) {
@@ -62,55 +62,7 @@ const createBlog = async function (req, res) {
   }
 }
 
-//////////////////// Delete Api ///////////////////////////////////////////
-const deleteblog = async function (req, res) {
-
-  try {
-    let BlogId = req.params.BlogId;
-    let Blog = await blogsModel.findById(BlogId);
-    if (!Blog) {
-      return res.status(404).send({ status: false, msg: "Does not exists" });
-    }
-
-    let deletedblog = await blogsModel.findOneAndUpdate(
-      { _id: BlogId },
-      { $set: { isDeleted: true } },
-      { new: true },
-    );
-
-    res.status(200).send({ status: true, data: deletedblog });
-  }
-  catch (err) {
-    console.log("This is the error :", err.message)
-    res.status(500).send({ msg: "Error", error: err.message })
-  };
-}
-
-let deletedByQueryParams = async function (req, res) {
-  try {
-    let data = req.query;
-
-    if (data) {
-      let deletedBlogsFinal = await blogsModel.updateMany(
-        { $in: data },
-        { $set: { isDeleted: true }, deletedAt: Date.now() },
-        { new: true }
-      );
-
-      res.status(200).send({ status: true, result: deletedBlogsFinal });
-    } else {
-      res.status(400).send({ ERROR: "BAD REQUEST" });
-    }
-  } catch (err) {
-    res.status(500).send({ ERROR: err.message });
-  }
-};
-
-
-
-//////////////////// Update Api ///////////////////////////////////////////
-
-
+/////////////////////////////////////////Update Api/////////////////////////////////////////////////
 
 const updateBlog = async function (req, res) {
   try {
@@ -146,6 +98,53 @@ catch(err) {
     res.status(500).send({ msg: err.message })
   }
 }
+
+//////////////////// Delete Api ///////////////////////////////////////////
+//1...
+const deleteblog = async function (req, res) {
+
+  try {
+    let BlogId = req.params.BlogId;
+    let Blog = await blogsModel.findById(BlogId);
+    if (!Blog) {
+      return res.status(404).send({ status: false, msg: "Does not exists" });
+    }
+
+    let deletedblog = await blogsModel.findOneAndUpdate(
+      { _id: BlogId },
+      { $set: { isDeleted: true } },
+      { new: true },
+    );
+
+    res.status(200).send({ status: true, data: deletedblog });
+  }
+  catch (err) {
+    console.log("This is the error :", err.message)
+    res.status(500).send({ msg: "Error", error: err.message })
+  };
+}
+
+//2...
+
+let deletedByQueryParams = async function (req, res) {
+  try {
+    let data = req.query;
+
+    if (data) {
+      let deletedBlogsFinal = await blogsModel.updateMany(
+        { $in: data },
+        { $set: { isDeleted: true }, deletedAt: Date.now() },
+        { new: true }
+      );
+
+      res.status(200).send({ status: true, result: deletedBlogsFinal });
+    } else {
+      res.status(400).send({ ERROR: "BAD REQUEST" });
+    }
+  } catch (err) {
+    res.status(500).send({ ERROR: err.message });
+  }
+};
 
 
 module.exports.createBlog = createBlog
