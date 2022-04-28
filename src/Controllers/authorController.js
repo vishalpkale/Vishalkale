@@ -1,4 +1,7 @@
+const jwt = require("jsonwebtoken");
 const authorModel = require("../Models/authorModel")
+
+///////////////////////////////////////////createauthor(Phase-1)//////////////////////////////////////////////////
 
 const createAuthor = async function (req, res) {
 try {
@@ -55,4 +58,39 @@ catch (error) {
 }
 }
 
+
+////////////////////////////////////////////authorlogin(Phase-2)/////////////////////////////////////////////////////
+
+const Authorlogin = async function (req, res) {
+  try {
+      let emailId = req.body.email;
+    let password = req.body.password;
+  
+    let auth = await authorModel.findOne({ email: emailId, password: password });
+    console.log(auth)
+    if (!auth)
+      return res.status(400).send({
+        status: false,
+        msg: "Email or the password credentials are not correct",
+      });
+  
+    let jwttoken = jwt.sign(
+      {
+        author: auth._id.toString(),
+        batch: "Uranium",
+        organisation: "Backend Cohort",
+      },
+        "Uranium-Group-24"
+    );
+    res.setHeader("x-auth-token", jwttoken);
+    res.send({ status: true,  data: jwttoken });
+}
+
+catch (error) {
+    return res.status(500).send({ msg: error.message })
+}
+}
+
+
 module.exports.createAuthor = createAuthor
+module.exports.Authorlogin = Authorlogin
