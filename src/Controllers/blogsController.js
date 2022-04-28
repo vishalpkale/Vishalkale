@@ -184,7 +184,6 @@ let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
 
-
     if (Object.keys(queryparams).length==0) {
 
       return res.status(400).send({
