@@ -62,6 +62,8 @@ const createBlog = async function (req, res) {
   }
 }
 
+////////////////////////////////////////////////////getBlogs///////////////////////////////////////////////////////////////////////
+
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -109,7 +111,8 @@ const getConditions = (obj, item) => {
   return condition;
 }
 
-//////////////////// Update Api ///////////////////////////////////////////
+//////////////////// ///////////////////////////////Update Api /////////////////////////////////////////////////////////////////////////////////
+
 const updateBlog = async function (req, res) {
   try {
      let title = req.body.title
@@ -123,8 +126,7 @@ const updateBlog = async function (req, res) {
     if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
     if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
     if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
-    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
-
+  
 
     const chkid = await blogsModel.findById({"_id": blogId })
     if (!chkid) {
@@ -145,15 +147,16 @@ catch(err) {
   }
 }
 
-//////////////////// Delete Api ///////////////////////////////////////////
+/////////////////////////////////////// Delete Api //////////////////////////////////////////////////////////////////
 //1...
+
 const deleteblog = async function (req, res) {
 
   try {
     let BlogId = req.params.BlogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
-      return res.status(404).send({ status: false, msg: "Does not exists" });
+      return res.status(404).send({ status: false, msg: "BlogID Does not exists" });
     }
 
     let deletedblog = await blogsModel.findOneAndUpdate(
@@ -182,9 +185,9 @@ let deletedByQueryParams = async function (req, res) {
         { $set: { isDeleted: true }, deletedAt: Date.now() },
         { new: true }
       );
-
       res.status(200).send({ status: true, result: deletedBlogsFinal });
-    } else {
+    } 
+    else {
       res.status(400).send({ ERROR: "BAD REQUEST" });
     }
   } catch (err) {

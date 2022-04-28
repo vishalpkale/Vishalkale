@@ -17,7 +17,8 @@ title: {
 }, 
 email: {
     type: mongoose.SchemaTypes.Email, 
-    unique: true
+    unique: true,
+    required: true
 }, 
 password: {
     type: String,
