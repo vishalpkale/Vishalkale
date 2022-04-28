@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const TokenValidation = function (req, res, next) {
 
-    //try {
+    try {
         let jwttoken = req.headers["X-AUTH-TOKEN"];
 
         if (!jwttoken) {
@@ -24,10 +24,10 @@ const TokenValidation = function (req, res, next) {
         }
         req.api = true
         next();
-   // }
-    // catch (error) {
-    //     return res.status(500).send({ msg: error.message })
-    // }
+   }
+     catch (error) {
+         return res.status(500).send({ msg: error.message })
+     }
 }
 module.exports.TokenValidation = TokenValidation
 
