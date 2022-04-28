@@ -9,10 +9,10 @@ const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
 const createBlog = async function (req, res) {
   try {
     const requestBody = req.body;
-    if (!requestBody) {
+    if (Object.keys(requestBody).length==0) {
       return res.status(400).send({
         status: false,
-        message: "Invalid request parameters. Please provide blog details",
+        msg: "Invalid request parameters. Please provide blog details",
       });
     }
 
@@ -112,7 +112,16 @@ const getConditions = (obj, item) => {
 //////////////////// Update Api ///////////////////////////////////////////
 const updateBlog = async function (req, res) {
   try {
-     let title = req.body.title
+    
+    const requestBody = req.body;
+    if (Object.keys(requestBody).length==0) {
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+    }
+    
+    let title = req.body.title
      let body = req.body.body
      let tags = req.body.tags
      let subcategory = req.body.subcategory
@@ -134,11 +143,11 @@ const updateBlog = async function (req, res) {
     {
       res.status(404).send({status:false,msg:"The document is deleted"})
     }
-    const updatblog = await blogsModel.updateOne(
-      { "_id": blogId },
-      { $set:{ "title": title , "body": body, "tags": tags ,"subcategory": subcategory , "isPublished": true, "publishedAt": dateStr }},
+    const updatblog = await blogsModel.findByIdAndUpdate(
+      { _id: blogId },
+      { $set:{ title: title , body: body, tags: tags ,subcategory: subcategory , isPublished: true, publishedAt: dateStr }},
       { new: true })
-    res.status(201).send({ Status: true, msg: updatblog })
+    res.status(201).send({ Status: true, Data: updatblog })
   }
 catch(err) {
     res.status(500).send({ msg: err.message })
@@ -150,6 +159,7 @@ catch(err) {
 const deleteblog = async function (req, res) {
 
   try {
+    
     let BlogId = req.params.BlogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
@@ -175,6 +185,15 @@ const deleteblog = async function (req, res) {
 let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
+
+    
+    if (Object.keys(queryparams).length==0) {
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+    }
+    
     const { category, authorId, tags, subcategory,isPublished } = queryparams
     console.log(queryparams)
 
