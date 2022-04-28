@@ -61,7 +61,7 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
-
+///////////////////////////////////////fetch/////////////////////////////////////////
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -128,11 +128,11 @@ const updateBlog = async function (req, res) {
 
     const chkid = await blogsModel.findById({"_id": blogId })
     if (!chkid) {
-      res.status(400).send({ status: false, msg: "blog isn't available please check blog Id" })
+      res.status(404).send({ status: false, msg: "blog isn't available please check blog Id" })
     }
     if(chkid.isDeleted==true)
     {
-      res.status(400).send({status:false,msg:"The document is deleted"})
+      res.status(404).send({status:false,msg:"The document is deleted"})
     }
     const updatblog = await blogsModel.updateOne(
       { "_id": blogId },
