@@ -162,7 +162,7 @@ const deleteblog = async function (req, res) {
       { new: true },
     );
 
-    res.status(200).send({ status: true, data: deletedblog });
+    res.status(200).send({ status: true, msg: "Data Deleted succefully" });
   }
   catch (err) {
     console.log("This is the error :", err.message)
@@ -174,20 +174,38 @@ const deleteblog = async function (req, res) {
 
 let deletedByQueryParams = async function (req, res) {
   try {
-    let data = req.query;
+    const queryparams = req.query;
+    const { category, authorId, tags, subcategory,isPublished } = queryparams
+    console.log(queryparams)
 
-    if (data) {
-      let deletedBlogsFinal = await blogsModel.updateMany(
-        { $in: data },
-        { $set: { isDeleted: true }, deletedAt: Date.now() },
-        { new: true }
-      );
+    const blog = await blogsModel.find(queryparams).select({ title: 1, _id:0})
+    console.log(blog)
+    console.log(blog[0].title)
 
-      res.status(200).send({ status: true, result: deletedBlogsFinal });
-    } else {
-      res.status(400).send({ ERROR: "BAD REQUEST" });
+    //blog not found 
+    if(!blog){
+      return res.status(404).send({ status: false, message: "Blog does not exist"})
     }
-  } catch (err) {
+
+    //Declared empty array
+
+    let arrayofBlogs = []
+    //for loop to store all the blog to declare 
+    for (let i=0; i<blog.length; i++){
+      let blogId = blog[i].title
+      arrayofBlogs.push(blogId)
+    }
+    console.log(arrayofBlogs)
+    
+    //const date = new Date(Date.now())
+    const deletedblogs = await blogsModel.updateMany({ title:{ $in: arrayofBlogs }},{$set: {deletedAt: dateStr, isDeleted: true}},
+      { new : true})
+    console.log(arrayofBlogs)
+
+      res.status(200).send({ status: true, result: deletedblogs });
+
+  }
+   catch (err) {
     res.status(500).send({ ERROR: err.message });
   }
 };
