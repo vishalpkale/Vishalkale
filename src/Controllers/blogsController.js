@@ -53,7 +53,7 @@ const createBlog = async function (req, res) {
         .send({ status: false, message: `Author does not exists.` });
     }
     const createdata = await blogsModel.create(requestBody)
-    console.log(createdata)
+  
     res.status(201).send({ status: true, data: createdata })
   }
   catch (error) {
@@ -61,13 +61,8 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
-<<<<<<< HEAD
+///////////////////////////////////////fetchblog////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////getBlogs///////////////////////////////////////////////////////////////////////
-
-=======
-///////////////////////////////////////fetch/////////////////////////////////////////
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -119,7 +114,6 @@ const getConditions = (obj, item) => {
 
 const updateBlog = async function (req, res) {
   try {
-    
     const requestBody = req.body;
     if (Object.keys(requestBody).length==0) {
       return res.status(400).send({
@@ -134,22 +128,12 @@ const updateBlog = async function (req, res) {
      let subcategory = req.body.subcategory
     let blogId = req.params.blogId
    
-<<<<<<< HEAD
-    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
-    if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
-    if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
-    if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
-    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
-  
-=======
     if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
     if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
     if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
     if (!tags) { res.status(400).send({ status: false, msg: "tags should be present" }) }
     if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
-    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
-
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
+    
 
     const chkid = await blogsModel.findById({"_id": blogId })
     if (!chkid) {
@@ -174,9 +158,7 @@ catch(err) {
 //1...
 
 const deleteblog = async function (req, res) {
-
   try {
-    
     let BlogId = req.params.BlogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
@@ -202,26 +184,12 @@ const deleteblog = async function (req, res) {
 let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
-
-<<<<<<< HEAD
-    if (data) {
-      let deletedBlogsFinal = await blogsModel.updateMany(
-        { $in: data },
-        { $set: { isDeleted: true }, deletedAt: Date.now() },
-        { new: true }
-      );
-      res.status(200).send({ status: true, result: deletedBlogsFinal });
-    } 
-    else {
-      res.status(400).send({ ERROR: "BAD REQUEST" });
-=======
-    
+ 
     if (Object.keys(queryparams).length==0) {
       return res.status(400).send({
         status: false,
         msg: "Invalid request parameters. Please provide blog details",
       });
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
     }
     
     const { category, authorId, tags, subcategory,isPublished } = queryparams
@@ -237,7 +205,6 @@ let deletedByQueryParams = async function (req, res) {
     }
 
     //Declared empty array
-
     let arrayofBlogs = []
     //for loop to store all the blog to declare 
     for (let i=0; i<blog.length; i++){
@@ -246,7 +213,7 @@ let deletedByQueryParams = async function (req, res) {
     }
     console.log(arrayofBlogs)
     
-    //const date = new Date(Date.now())
+    
     const deletedblogs = await blogsModel.updateMany({ title:{ $in: arrayofBlogs }},{$set: {deletedAt: dateStr, isDeleted: true}},
       { new : true})
     console.log(arrayofBlogs)
