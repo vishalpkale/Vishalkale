@@ -9,10 +9,10 @@ const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
 const createBlog = async function (req, res) {
   try {
     const requestBody = req.body;
-    if (!requestBody) {
+    if (Object.keys(requestBody).length==0) {
       return res.status(400).send({
         status: false,
-        message: "Invalid request parameters. Please provide blog details",
+        msg: "Invalid request parameters. Please provide blog details",
       });
     }
 
@@ -61,9 +61,13 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
+<<<<<<< HEAD
 
 ////////////////////////////////////////////////////getBlogs///////////////////////////////////////////////////////////////////////
 
+=======
+///////////////////////////////////////fetch/////////////////////////////////////////
+>>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -115,32 +119,51 @@ const getConditions = (obj, item) => {
 
 const updateBlog = async function (req, res) {
   try {
-     let title = req.body.title
+    
+    const requestBody = req.body;
+    if (Object.keys(requestBody).length==0) {
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+    }
+    
+    let title = req.body.title
      let body = req.body.body
      let tags = req.body.tags
      let subcategory = req.body.subcategory
     let blogId = req.params.blogId
    
+<<<<<<< HEAD
     if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
     if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
     if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
     if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
     if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
   
+=======
+    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
+    if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
+    if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
+    if (!tags) { res.status(400).send({ status: false, msg: "tags should be present" }) }
+    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
+    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
+
+>>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
 
     const chkid = await blogsModel.findById({"_id": blogId })
     if (!chkid) {
-      res.status(400).send({ status: false, msg: "blog isn't available please check blog Id" })
+      res.status(404).send({ status: false, msg: "blog isn't available please check blog Id" })
     }
     if(chkid.isDeleted==true)
     {
-      res.status(400).send({status:false,msg:"The document is deleted"})
+      res.status(404).send({status:false,msg:"The document is deleted"})
     }
-    const updatblog = await blogsModel.updateOne(
-      { "_id": blogId },
-      { $set:{ "title": title , "body": body, "tags": tags ,"subcategory": subcategory , "isPublished": true, "publishedAt": dateStr }},
+    const updatblog = await blogsModel.findByIdAndUpdate(
+      { _id: blogId },
+      { $set:{ title: title , body: body, tags: tags ,subcategory: subcategory , isPublished: true, publishedAt: dateStr }},
       { new: true })
-    res.status(201).send({ Status: true, msg: updatblog })
+    res.status(201).send({ Status: true, Data: updatblog })
   }
 catch(err) {
     res.status(500).send({ msg: err.message })
@@ -153,6 +176,7 @@ catch(err) {
 const deleteblog = async function (req, res) {
 
   try {
+    
     let BlogId = req.params.BlogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
@@ -165,7 +189,7 @@ const deleteblog = async function (req, res) {
       { new: true },
     );
 
-    res.status(200).send({ status: true, data: deletedblog });
+    res.status(200).send({ status: true, msg: "Data Deleted succefully" });
   }
   catch (err) {
     console.log("This is the error :", err.message)
@@ -177,8 +201,9 @@ const deleteblog = async function (req, res) {
 
 let deletedByQueryParams = async function (req, res) {
   try {
-    let data = req.query;
+    const queryparams = req.query;
 
+<<<<<<< HEAD
     if (data) {
       let deletedBlogsFinal = await blogsModel.updateMany(
         { $in: data },
@@ -189,8 +214,47 @@ let deletedByQueryParams = async function (req, res) {
     } 
     else {
       res.status(400).send({ ERROR: "BAD REQUEST" });
+=======
+    
+    if (Object.keys(queryparams).length==0) {
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+>>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
     }
-  } catch (err) {
+    
+    const { category, authorId, tags, subcategory,isPublished } = queryparams
+    console.log(queryparams)
+
+    const blog = await blogsModel.find(queryparams).select({ title: 1, _id:0})
+    console.log(blog)
+    console.log(blog[0].title)
+
+    //blog not found 
+    if(!blog){
+      return res.status(404).send({ status: false, message: "Blog does not exist"})
+    }
+
+    //Declared empty array
+
+    let arrayofBlogs = []
+    //for loop to store all the blog to declare 
+    for (let i=0; i<blog.length; i++){
+      let blogId = blog[i].title
+      arrayofBlogs.push(blogId)
+    }
+    console.log(arrayofBlogs)
+    
+    //const date = new Date(Date.now())
+    const deletedblogs = await blogsModel.updateMany({ title:{ $in: arrayofBlogs }},{$set: {deletedAt: dateStr, isDeleted: true}},
+      { new : true})
+    console.log(arrayofBlogs)
+
+      res.status(200).send({ status: true, result: deletedblogs });
+
+  }
+   catch (err) {
     res.status(500).send({ ERROR: err.message });
   }
 };
