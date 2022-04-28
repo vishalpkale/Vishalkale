@@ -61,13 +61,7 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
-<<<<<<< HEAD
-
-////////////////////////////////////////////////////getBlogs///////////////////////////////////////////////////////////////////////
-
-=======
 ///////////////////////////////////////fetch/////////////////////////////////////////
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -134,14 +128,6 @@ const updateBlog = async function (req, res) {
      let subcategory = req.body.subcategory
     let blogId = req.params.blogId
    
-<<<<<<< HEAD
-    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
-    if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
-    if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
-    if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
-    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
-  
-=======
     if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
     if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
     if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
@@ -149,7 +135,6 @@ const updateBlog = async function (req, res) {
     if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
     // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
 
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
 
     const chkid = await blogsModel.findById({"_id": blogId })
     if (!chkid) {
@@ -203,25 +188,12 @@ let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
 
-<<<<<<< HEAD
-    if (data) {
-      let deletedBlogsFinal = await blogsModel.updateMany(
-        { $in: data },
-        { $set: { isDeleted: true }, deletedAt: Date.now() },
-        { new: true }
-      );
-      res.status(200).send({ status: true, result: deletedBlogsFinal });
-    } 
-    else {
-      res.status(400).send({ ERROR: "BAD REQUEST" });
-=======
     
     if (Object.keys(queryparams).length==0) {
       return res.status(400).send({
         status: false,
         msg: "Invalid request parameters. Please provide blog details",
       });
->>>>>>> 8cee3f331fc79e82f07f1653173451abb9b115f0
     }
     
     const { category, authorId, tags, subcategory,isPublished } = queryparams
