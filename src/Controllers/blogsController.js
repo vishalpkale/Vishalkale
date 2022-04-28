@@ -61,12 +61,8 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
-<<<<<<< HEAD
-///////////////////////////////////////fetch/////////////////////////////////////////
-=======
 ///////////////////////////////////////fetchblog////////////////////////////////////////////////////
 
->>>>>>> 3529e6d90d9b9016ba3b10113cfd4862df9c15e9
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -131,18 +127,6 @@ const updateBlog = async function (req, res) {
     let tags = req.body.tags
     let subcategory = req.body.subcategory
     let blogId = req.params.blogId
-<<<<<<< HEAD
-   
-    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
-    if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
-    if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
-    if (!tags) { res.status(400).send({ status: false, msg: "tags should be present" }) }
-    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
-    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
-
-
-    const chkid = await blogsModel.findById({"_id": blogId })
-=======
 
     if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
     if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
@@ -152,7 +136,6 @@ const updateBlog = async function (req, res) {
     
 
     const chkid = await blogsModel.findById({ "_id": blogId })
->>>>>>> 3529e6d90d9b9016ba3b10113cfd4862df9c15e9
     if (!chkid) {
       res.status(404).send({ status: false, msg: "blog isn't available please check blog Id" })
     }
@@ -201,11 +184,6 @@ let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
 
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> 3529e6d90d9b9016ba3b10113cfd4862df9c15e9
     if (Object.keys(queryparams).length==0) {
 
       return res.status(400).send({
