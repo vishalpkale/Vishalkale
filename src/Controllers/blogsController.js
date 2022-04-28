@@ -165,6 +165,9 @@ const deleteblog = async function (req, res) {
     if (!Blog) {
       return res.status(404).send({ status: false, msg: "Does not exists" });
     }
+    if(chkid.isDeleted==true)
+    {
+      res.status(404).send({status:false,msg:"The document is deleted"})
 
     let deletedblog = await blogsModel.findOneAndUpdate(
       { _id: BlogId },
