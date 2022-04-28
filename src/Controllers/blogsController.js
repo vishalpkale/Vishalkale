@@ -1,8 +1,11 @@
 const mongoose = require('mongoose')
+const jwt = require("jsonwebtoken");
 const authorModel = require('../Models/authorModel')
 const blogsModel = require('../Models/blogsModel')
+const authorMiddleware = require('../Middlewares/authorMiddleware')
 const date = new Date();
 const dateStr = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+//const auth = authorMiddleware.authorization()
 
 ///////////////////////////////////////////////createBlogs//////////////////////////////////////////////////////////////
 
@@ -52,8 +55,11 @@ const createBlog = async function (req, res) {
         .status(400)
         .send({ status: false, message: `Author does not exists.` });
     }
+    if (findauthor.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
     const createdata = await blogsModel.create(requestBody)
-  
+
     res.status(201).send({ status: true, data: createdata })
   }
   catch (error) {
@@ -113,8 +119,24 @@ const getConditions = (obj, item) => {
 //////////////////// ///////////////////////////////Update Api /////////////////////////////////////////////////////////////////////////////////
 
 const updateBlog = async function (req, res) {
-  try {
+  //try {
+    let jwttoken = req.headers["X-AUTH-TOKEN"];
+
+    if (!jwttoken) {
+      jwttoken = req.headers["x-auth-token"];
+    }
+
+    if (!jwttoken) {
+      jwttoken = req.headers["X-Auth-Token"];
+    }
+    console.log(jwttoken);
+
+    let verifyAuthor = jwt.verify(jwttoken, "FunctionUp-Uranium");
+
+    let auth = verifyAuthor.autherId
+
     const requestBody = req.body;
+    console.log(auth)
     if (Object.keys(requestBody).length == 0) {
       return res.status(400).send({
         status: false,
@@ -133,7 +155,7 @@ const updateBlog = async function (req, res) {
     if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
     if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
     if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
-    
+
 
     const chkid = await blogsModel.findById({ "_id": blogId })
     if (!chkid) {
@@ -142,15 +164,18 @@ const updateBlog = async function (req, res) {
     if (chkid.isDeleted == true) {
       res.status(404).send({ status: false, msg: "The document is deleted" })
     }
+    if (chkid.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
     const updatblog = await blogsModel.findByIdAndUpdate(
       { _id: blogId },
       { $set: { title: title, body: body, tags: tags, subcategory: subcategory, isPublished: true, publishedAt: dateStr } },
       { new: true })
     res.status(201).send({ Status: true, Data: updatblog })
-  }
-  catch (err) {
-    res.status(500).send({ msg: err.message })
-  }
+  // }
+  // catch (err) {
+  //   res.status(500).send({ msg: err.message })
+  // }
 }
 
 /////////////////////////////////////// Delete Api //////////////////////////////////////////////////////////////////
@@ -163,7 +188,9 @@ const deleteblog = async function (req, res) {
     if (!Blog) {
       return res.status(404).send({ status: false, msg: "BlogID Does not exists" });
     }
-
+    if (Blog.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
     let deletedblog = await blogsModel.findOneAndUpdate(
       { _id: BlogId },
       { $set: { isDeleted: true } },
@@ -184,7 +211,7 @@ let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
 
-    if (Object.keys(queryparams).length==0) {
+    if (Object.keys(queryparams).length == 0) {
 
       return res.status(400).send({
         status: false,
@@ -211,7 +238,7 @@ let deletedByQueryParams = async function (req, res) {
       let blogId = blog[i].title
       arrayofBlogs.push(blogId)
     }
-   
+
     const deletedblogs = await blogsModel.updateMany({ title: { $in: arrayofBlogs } }, { $set: { deletedAt: dateStr, isDeleted: true } },
       { new: true })
     //console.log(arrayofBlogs)
