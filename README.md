@@ -176,7 +176,7 @@ BRUCE STERLING-----
 "title": "Conversations on consciousness",
 "body": "Blackmore explores the big questions on the nature of brains, minds, and consciousness, through twenty lively and engaging interviews with some of the best-known personalities from the worlds of science and philosophy. - ;A delightful collection of interviews with 20 famous names in the study of consciousness.",
 "authorId": "6268eb9e4919ddf8f7db0d8f",
-"tags": " Conversations",
+"tags": "Conversations",
 "category": "essays",
 "subcategory": "bicameral mind",
 

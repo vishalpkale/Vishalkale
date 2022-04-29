@@ -1,18 +1,21 @@
 const mongoose = require('mongoose')
+const jwt = require("jsonwebtoken");
 const authorModel = require('../Models/authorModel')
 const blogsModel = require('../Models/blogsModel')
+const authorMiddleware = require('../Middlewares/authorMiddleware')
 const date = new Date();
-const dateStr = `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`
+const dateStr = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`
+//const auth = authorMiddleware.authorization()
 
 ///////////////////////////////////////////////createBlogs//////////////////////////////////////////////////////////////
 
 const createBlog = async function (req, res) {
   try {
     const requestBody = req.body;
-    if (!requestBody) {
+    if (Object.keys(requestBody).length == 0) {
       return res.status(400).send({
         status: false,
-        message: "Invalid request parameters. Please provide blog details",
+        msg: "Invalid request parameters. Please provide blog details",
       });
     }
 
@@ -52,8 +55,11 @@ const createBlog = async function (req, res) {
         .status(400)
         .send({ status: false, message: `Author does not exists.` });
     }
+    if (findauthor.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
     const createdata = await blogsModel.create(requestBody)
-    console.log(createdata)
+
     res.status(201).send({ status: true, data: createdata })
   }
   catch (error) {
@@ -61,7 +67,8 @@ const createBlog = async function (req, res) {
     res.status(500).send({ msg: error.message })
   }
 }
-///////////////////////////////////////fetch/////////////////////////////////////////
+///////////////////////////////////////fetchblog////////////////////////////////////////////////////
+
 const getBlog = async function (req, res) {
   try {
     let blogs = await blogsModel.find()
@@ -109,53 +116,81 @@ const getConditions = (obj, item) => {
   return condition;
 }
 
-//////////////////// Update Api ///////////////////////////////////////////
+//////////////////// ///////////////////////////////Update Api /////////////////////////////////////////////////////////////////////////////////
+
 const updateBlog = async function (req, res) {
-  try {
-     let title = req.body.title
-     let body = req.body.body
-     let tags = req.body.tags
-     let subcategory = req.body.subcategory
+  //try {
+    let jwttoken = req.headers["X-AUTH-TOKEN"];
+
+    if (!jwttoken) {
+      jwttoken = req.headers["x-auth-token"];
+    }
+
+    if (!jwttoken) {
+      jwttoken = req.headers["X-Auth-Token"];
+    }
+    console.log(jwttoken);
+
+    let verifyAuthor = jwt.verify(jwttoken, "FunctionUp-Uranium");
+
+    let auth = verifyAuthor.autherId
+
+    const requestBody = req.body;
+    console.log(auth)
+    if (Object.keys(requestBody).length == 0) {
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+    }
+
+    let title = req.body.title
+    let body = req.body.body
+    let tags = req.body.tags
+    let subcategory = req.body.subcategory
     let blogId = req.params.blogId
-   
-    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should be present" }) }
-    if (!title) { res.status(400).send({ status: false, msg: "title should be present" }) }
-    if (!body) { res.status(400).send({ status: false, msg: "body should be present" }) }
-    if (!tags) { res.status(400).send({ status: false, msg: "tags should be present" }) }
-    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should be present" }) }
-    // if (!publishedAt) { res.status(400).send({ status: false, msg: "publishedAt should present" }) }
+
+    if (!blogId) { res.status(400).send({ status: false, msg: "BlogId should present" }) }
+    if (!title) { res.status(400).send({ status: false, msg: "title should present" }) }
+    if (!body) { res.status(400).send({ status: false, msg: "body should present" }) }
+    if (!tags) { res.status(400).send({ status: false, msg: "tags should present" }) }
+    if (!subcategory) { res.status(400).send({ status: false, msg: "subcategory should present" }) }
 
 
-    const chkid = await blogsModel.findById({"_id": blogId })
+    const chkid = await blogsModel.findById({ "_id": blogId })
     if (!chkid) {
       res.status(404).send({ status: false, msg: "blog isn't available please check blog Id" })
     }
-    if(chkid.isDeleted==true)
-    {
-      res.status(404).send({status:false,msg:"The document is deleted"})
+    if (chkid.isDeleted == true) {
+      res.status(404).send({ status: false, msg: "The document is deleted" })
     }
-    const updatblog = await blogsModel.updateOne(
-      { "_id": blogId },
-      { $set:{ "title": title , "body": body, "tags": tags ,"subcategory": subcategory , "isPublished": true, "publishedAt": dateStr }},
+    if (chkid.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
+    const updatblog = await blogsModel.findByIdAndUpdate(
+      { _id: blogId },
+      { $set: { title: title, body: body, tags: tags, subcategory: subcategory, isPublished: true, publishedAt: dateStr } },
       { new: true })
-    res.status(201).send({ Status: true, msg: updatblog })
-  }
-catch(err) {
-    res.status(500).send({ msg: err.message })
-  }
+    res.status(201).send({ Status: true, Data: updatblog })
+  // }
+  // catch (err) {
+  //   res.status(500).send({ msg: err.message })
+  // }
 }
 
-//////////////////// Delete Api ///////////////////////////////////////////
+/////////////////////////////////////// Delete Api //////////////////////////////////////////////////////////////////
 //1...
-const deleteblog = async function (req, res) {
 
+const deleteblog = async function (req, res) {
   try {
     let BlogId = req.params.BlogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
-      return res.status(404).send({ status: false, msg: "Does not exists" });
+      return res.status(404).send({ status: false, msg: "BlogID Does not exists" });
     }
-
+    if (Blog.authorId != auth) {
+      res.status(404).send({ status: false, msg: "Access denied" })
+    }
     let deletedblog = await blogsModel.findOneAndUpdate(
       { _id: BlogId },
       { $set: { isDeleted: true } },
@@ -175,37 +210,43 @@ const deleteblog = async function (req, res) {
 let deletedByQueryParams = async function (req, res) {
   try {
     const queryparams = req.query;
-    const { category, authorId, tags, subcategory,isPublished } = queryparams
-    console.log(queryparams)
 
-    const blog = await blogsModel.find(queryparams).select({ title: 1, _id:0})
-    console.log(blog)
-    console.log(blog[0].title)
+    if (Object.keys(queryparams).length == 0) {
+
+      return res.status(400).send({
+        status: false,
+        msg: "Invalid request parameters. Please provide blog details",
+      });
+    }
+
+    const { category, authorId, tags, subcategory, isPublished } = queryparams
+    //console.log(queryparams)
+
+    const blog = await blogsModel.find(queryparams).select({ title: 1, _id: 0 })
+    // console.log(blog)
+    //.log(blog[0].title)
 
     //blog not found 
-    if(!blog){
-      return res.status(404).send({ status: false, message: "Blog does not exist"})
+    if (!blog) {
+      return res.status(404).send({ status: false, message: "Blog does not exist" })
     }
 
     //Declared empty array
-
     let arrayofBlogs = []
     //for loop to store all the blog to declare 
-    for (let i=0; i<blog.length; i++){
+    for (let i = 0; i < blog.length; i++) {
       let blogId = blog[i].title
       arrayofBlogs.push(blogId)
     }
-    console.log(arrayofBlogs)
-    
-    //const date = new Date(Date.now())
-    const deletedblogs = await blogsModel.updateMany({ title:{ $in: arrayofBlogs }},{$set: {deletedAt: dateStr, isDeleted: true}},
-      { new : true})
-    console.log(arrayofBlogs)
 
-      res.status(200).send({ status: true, result: deletedblogs });
+    const deletedblogs = await blogsModel.updateMany({ title: { $in: arrayofBlogs } }, { $set: { deletedAt: dateStr, isDeleted: true } },
+      { new: true })
+    //console.log(arrayofBlogs)
+
+    res.status(200).send({ status: true, result: deletedblogs });
 
   }
-   catch (err) {
+  catch (err) {
     res.status(500).send({ ERROR: err.message });
   }
 };
