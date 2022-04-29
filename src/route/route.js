@@ -16,12 +16,11 @@ router.post("/Blogs",authorMid.TokenValidation,authorMid.authorization, blogsCon
 //getBlogs
 router.get("/blogs",authorMid.TokenValidation, blogsController.getBlog)
 
-
 //UpdateBlogs
-router.put("/blogs/:BlogId",authorMid.TokenValidation,authorMid.authorization, blogsController.updateBlog)
+router.put("/blogs/:blogId",authorMid.TokenValidation,authorMid.authorization, blogsController.updateBlog)
 
 //DeleteBlogs
-router.delete("/Blogs/:BlogId",authorMid.TokenValidation,authorMid.authorization, blogsController.deleteblog)    //1
+router.delete("/Blogs/:BlogId",authorMid.TokenValidation,authorMid.authorizationForDelete, blogsController.deleteblog)    //1
 
 router.delete("/deletedByQueryParams", blogsController.deletedByQueryParams)  //2
 
@@ -29,12 +28,5 @@ router.delete("/deletedByQueryParams", blogsController.deletedByQueryParams)  //
 
 //AuthorLogin
 router.post("/login",authorController.Authorlogin)
-
-
-
-
-
-
-
 
 module.exports = router;

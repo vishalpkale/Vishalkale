@@ -63,37 +63,36 @@ const createAuthor = async function (req, res) {
 ////////////////////////////////////////////authorlogin(Phase-2)/////////////////////////////////////////////////////
 
 const Authorlogin = async function (req, res) {
-    try {
-        let emailId = req.body.email;
-        let password = req.body.password;
+  try {
+    let emailId = req.body.email;
+    let password = req.body.password;
+  
+    let auth = await authorModel.findOne({ email: emailId, password: password });
+    console.log(auth)
+    if (!auth)
+      return res.status(400).send({
+        status: false,
+        msg: "Email or the password credentials are not correct",
+      });
+  
+    let jwttoken = jwt.sign(
+      {
+        author: auth._id.toString(),
+        batch: "Uranium",
+        organisation: "Backend Cohort",
+      },
+        "Uranium-Group-24"
+    );
+    res.setHeader("x-auth-token", jwttoken);
+    res.send({ status: true,  data: jwttoken });
+}
 
-        let auth = await authorModel.findOne({ email: emailId, password: password });
-        // console.log(auth)
-        if (!auth)
-            return res.status(400).send({
-                status: false,
-                msg: "Email or the password credentials are not correct",
-            });
-
-        let jwttoken = jwt.sign(
-            {
-                authorId: auth._id.toString(),
-                batch: "Uranium",
-                organisation: "BackendCohort",
-            },
-            "Uranium-Group-24"
-        );
-        //req.setHeader("x-auth-token", jwttoken);
-        res.send({ status: true, data: jwttoken });
-    }
 
     catch (error) {
         return res.status(500).send({ msg: error.message })
     }
 }
-// if (req.headers["isfreeappuser"] === 'true') {
-//   req.isFreeAppUser  = true
-//   next();
+
 
 module.exports.createAuthor = createAuthor
 module.exports.Authorlogin = Authorlogin
