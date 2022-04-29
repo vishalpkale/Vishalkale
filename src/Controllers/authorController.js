@@ -82,7 +82,7 @@ const Authorlogin = async function (req, res) {
       },
         "Uranium-Group-24"
     );
-    req.setHeader("x-auth-token", jwttoken);
+    res.setHeader("x-auth-token", jwttoken);
     res.send({ status: true,  data: jwttoken });
 }
 
@@ -90,9 +90,7 @@ catch (error) {
     return res.status(500).send({ msg: error.message })
 }
 }
-// if (req.headers["isfreeappuser"] === 'true') {
-//   req.isFreeAppUser  = true
-//   next();
+
 
 module.exports.createAuthor = createAuthor
 module.exports.Authorlogin = Authorlogin
