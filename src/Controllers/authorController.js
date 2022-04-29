@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const authorModel = require("../Models/authorModel")
+const passwordValidator = require('password-validator');
 
 ///////////////////////////////////////////createauthor(Phase-1)//////////////////////////////////////////////////
 
@@ -13,9 +14,6 @@ const createAuthor = async function (req, res) {
                 msg: "Invalid request parameters. Please provide blog details",
             });
         }
-
-        // if (!(fname && lname && title && email && password)) {
-        //     return res.status(400).send({ status: false, data: "required(*) fields are mandatory to fill" })
 
         if (!fname) {
             return res
@@ -48,9 +46,12 @@ const createAuthor = async function (req, res) {
         if (emailValidation) {
             return res.status(409).send({ status: false, data: "This Email has been registered already" })
         }
-
+        const schema = new passwordValidator();
+        schema.is().min(8)
+        if(!schema.validate(requestBody.password)){
+            return res.status(409).send({ status: false, data: "Minimum length of password should ne 8 characters" })
+        }
         let data = await authorModel.create(req.body)
-        console.log({ status: "successfully created", msg: data })
         return res.status(201).send({ status: true, data: data })
 
     }
@@ -77,7 +78,7 @@ const Authorlogin = async function (req, res) {
   
     let jwttoken = jwt.sign(
       {
-        author: auth._id.toString(),
+        authorId: auth._id.toString(),
         batch: "Uranium",
         organisation: "Backend Cohort",
       },
@@ -87,12 +88,10 @@ const Authorlogin = async function (req, res) {
     res.send({ status: true,  data: jwttoken });
 }
 
-
     catch (error) {
         return res.status(500).send({ msg: error.message })
     }
 }
-
 
 module.exports.createAuthor = createAuthor
 module.exports.Authorlogin = Authorlogin

@@ -4,7 +4,6 @@ const authorController = require("../Controllers/authorController")
 const blogsController = require("../Controllers/blogsController")
 const authorMid = require("../Middlewares/authorMiddleware")
 
-
 ////////////////////////////////////////(PHASE-1)/////////////////////////////////////////////////////////////
 
 //createAuthor
@@ -22,7 +21,7 @@ router.put("/blogs/:blogId",authorMid.TokenValidation,authorMid.authorization, b
 //DeleteBlogs
 router.delete("/Blogs/:BlogId",authorMid.TokenValidation,authorMid.authorizationForDelete, blogsController.deleteblog)    //1
 
-router.delete("/deletedByQueryParams", blogsController.deletedByQueryParams)  //2
+router.delete("/deletedByQueryParams",authorMid.TokenValidation, blogsController.deletedByQueryParams)  //2
 
 ///////////////////////////////////////(PHASE-2)/////////////////////////////////////////////////////////////
 

@@ -20,10 +20,10 @@ const TokenValidation = (req, res, next) => {
 
         let decodedToken = jwt.decode(jwttoken, "Uranium-Group-24"); //verifying token with secret key
 
-
         if (decodedToken.length == 0) { return res.status(401).send({ status: false, msg: "Token is incorrect" }) }
 
-        next(); //if token is correct then next function will be called respectively
+        req['x-api-key'] = req.headers['x-api-key']
+        next();
     }
     catch (err) {
         res.status(500).send({ status: false, data: err.message });
@@ -34,7 +34,7 @@ const authorization = async (req, res, next) => {
         let token = req.headers["x-Api-key"]; //getting token from header
         token = req.headers["x-api-key"];
         let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
-        let loggedInUser = decodedToken.author; //getting logged in user id from token
+        let loggedInUser = decodedToken.authorId; //getting logged in user id from token
         let authorLogging;
 
         if (req.body.hasOwnProperty('authorId')) { //if authorId is present in request body
@@ -57,7 +57,6 @@ const authorization = async (req, res, next) => {
                 return res.status(404).send({ status: false, msg: "Error, Please check Id and try again" });
             }
             authorLogging = blogData.authorId.toString(); //getting authorId from blog data using blogId and converting it to string
-            console.log(authorLogging)
         }
 
         //if authorId is not present in request body or request params or request query
@@ -78,7 +77,7 @@ const authorizationForDelete = async function (req, res, next) {
         token = req.headers["x-api-key"];
         let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
         
-        let loggedInUser = decodedToken.author; //getting logged in user id from token
+        let loggedInUser = decodedToken.authorId; //getting logged in user id from token
         let authorLogging;
 
         if (!isValidObjectId(req.params.BlogId)) {
@@ -99,5 +98,4 @@ const authorizationForDelete = async function (req, res, next) {
         res.status(500).send({ status: false, msg: err.message });
     }
 }
-
 module.exports = { TokenValidation, authorization,authorizationForDelete }; //exporting authentication and authorization functions
