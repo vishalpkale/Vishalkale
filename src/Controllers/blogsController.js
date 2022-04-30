@@ -53,7 +53,7 @@ const createBlog = async function (req, res) {
 }
 ///////////////////////////////////////fetchblog////////////////////////////////////////////////////
 
-const getBlog = async function (req, res) {
+const getBlog = async (req, res) => {
   try {
     let blogs = await blogsModel.find()
     let blog = []
@@ -105,6 +105,7 @@ const getConditions = (obj, item) => {
 const updateBlog = async function (req, res) {
   try {
     const requestBody = req.body;
+    // console.log(req.loggedInUser)
     let blogId = req.params.blogId
     if (Object.keys(requestBody).length == 0) {
       return res.status(400).send({
@@ -143,13 +144,13 @@ const deleteblog = async function (req, res) {
     }
     let deletedblog = await blogsModel.findOneAndUpdate(
       { _id: BlogId },
-      { $set: { isDeleted: true } }
+      { $set: { isDeleted: true, deletedAt: dateStr } }
     );
 
     res.status(200).send({ status: true, msg: "Data Deleted succefully" });
   }
   catch (err) {
-    console.log("This is the error :", err.message)
+    //console.log("This is the error :", err.message)
     res.status(500).send({ msg: "Error", error: err.message })
   };
 }
@@ -158,9 +159,10 @@ const deleteblog = async function (req, res) {
 
 let deletedByQueryParams = async function (req, res) {
   try {
-    let token = req.headers["x-Api-key"]; //getting token from header
-        token = req.headers["x-api-key"];
-        let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
+    let token = req['x-api-key']
+    // req.headers["x-Api-key"]; //getting token from header
+    //     token = req.headers["x-api-key"];
+         let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
         
         let loggedInUser = decodedToken.authorId;
     const queryparams = req.query;
@@ -177,11 +179,10 @@ let deletedByQueryParams = async function (req, res) {
       return res.status(404).send({ status: false, message: "Blog does not exist" })
     }
 
-    const deletedblogs = await blogsModel.updateMany({ _id: { $in: blog } }, { $set: { deletedAt: dateStr, isDeleted: true } },
-      { new: true })
-    if (deletedblogs.modifiedCount == 0) {
-      return res.status(200).send({ status: true, msg: "Nothing to delete" });
-    }
+    const deletedblogs = await blogsModel.updateMany({ _id: { $in: blog } }, { $set: { deletedAt: dateStr, isDeleted: true } })
+    // if (deletedblogs.modifiedCount == 0) {
+    //   return res.status(200).send({ status: true, msg: "Nothing to delete" });
+    // }
 
     return res.status(200).send({ status: true, msg: "Deleted" });
   }

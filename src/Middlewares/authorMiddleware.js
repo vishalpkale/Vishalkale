@@ -23,6 +23,7 @@ const TokenValidation = (req, res, next) => {
         if (decodedToken.length == 0) { return res.status(401).send({ status: false, msg: "Token is incorrect" }) }
 
         req['x-api-key'] = req.headers['x-api-key']
+        req['loggedInUser'] = decodedToken.authorId
         next();
     }
     catch (err) {
