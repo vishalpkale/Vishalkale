@@ -7,10 +7,10 @@ const authorMid = require("../Middlewares/authorMiddleware")
 ////////////////////////////////////////(PHASE-1)/////////////////////////////////////////////////////////////
 
 //createAuthor
-router.post("/Author",authorController.createAuthor)
+router.post("/authors",authorController.createAuthor)
 
 //createBlogs
-router.post("/Blogs",authorMid.TokenValidation,authorMid.authorization, blogsController.createBlog)
+router.post("/blogs",authorMid.TokenValidation,authorMid.authorization, blogsController.createBlog)
 
 //getBlogs
 router.get("/blogs",authorMid.TokenValidation, blogsController.getBlog)
@@ -19,9 +19,9 @@ router.get("/blogs",authorMid.TokenValidation, blogsController.getBlog)
 router.put("/blogs/:blogId",authorMid.TokenValidation,authorMid.authorization, blogsController.updateBlog)
 
 //DeleteBlogs
-router.delete("/Blogs/:BlogId",authorMid.TokenValidation,authorMid.authorizationForDelete, blogsController.deleteblog)    //1
+router.delete("/blogs/:blogId",authorMid.TokenValidation,authorMid.authorization, blogsController.deleteblog)    //1
 
-router.delete("/deletedByQueryParams",authorMid.TokenValidation, blogsController.deletedByQueryParams)  //2
+router.delete("/blogs",authorMid.TokenValidation, blogsController.deletedByQueryParams)  //2
 
 ///////////////////////////////////////(PHASE-2)/////////////////////////////////////////////////////////////
 

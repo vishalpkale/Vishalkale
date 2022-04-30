@@ -18,11 +18,12 @@ const TokenValidation = (req, res, next) => {
             return res.status(401).send({ status: false, msg: "Token must be present" });
         }
 
-        let decodedToken = jwt.decode(jwttoken, "Uranium-Group-24"); //verifying token with secret key
+        let decodedToken = jwt.verify(jwttoken, "Uranium-Group-24"); //verifying token with secret key
 
         if (decodedToken.length == 0) { return res.status(401).send({ status: false, msg: "Token is incorrect" }) }
 
         req['x-api-key'] = req.headers['x-api-key']
+        req['authorId']=decodedToken.authorId;
         next();
     }
     catch (err) {
@@ -31,10 +32,9 @@ const TokenValidation = (req, res, next) => {
 }
 const authorization = async (req, res, next) => {
     try {
-        let token = req.headers["x-Api-key"]; //getting token from header
-        token = req.headers["x-api-key"];
-        let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
-        let loggedInUser = decodedToken.authorId; //getting logged in user id from token
+        //author id extracted from token
+        let loggedInUser=req.authorId;
+        
         let authorLogging;
 
         if (req.body.hasOwnProperty('authorId')) { //if authorId is present in request body
@@ -71,31 +71,5 @@ const authorization = async (req, res, next) => {
     }
 }
 
-const authorizationForDelete = async function (req, res, next) {
-    try {
-        let token = req.headers["x-Api-key"]; //getting token from header
-        token = req.headers["x-api-key"];
-        let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
-        
-        let loggedInUser = decodedToken.authorId; //getting logged in user id from token
-        let authorLogging;
 
-        if (!isValidObjectId(req.params.BlogId)) {
-
-            return res.status(400).send({ status: false, msg: "Enter a valid blog Id" })
-        }
-        let blogData = await Blog.findById(req.params.BlogId); //getting blog data from database using blogId
-
-        if (!blogData) {
-            return res.status(404).send({ status: false, msg: "Error, Please check Id and try again" });
-        }
-        authorLogging = blogData.authorId.toString(); //getting authorId from blog data using blogId and converting it to string
-        
-        if (loggedInUser != authorLogging) return res.status(403).send({ status: false, msg: "Error, authorization failed" });
-        next(); //if authorId is same then next function will be called respectively
-    }
-    catch (err) {
-        res.status(500).send({ status: false, msg: err.message });
-    }
-}
-module.exports = { TokenValidation, authorization,authorizationForDelete }; //exporting authentication and authorization functions
+module.exports = { TokenValidation, authorization }; //exporting authentication and authorization functions
