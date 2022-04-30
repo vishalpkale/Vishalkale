@@ -55,20 +55,14 @@ const createBlog = async function (req, res) {
 
 const getBlog = async (req, res) => {
   try {
-    let blogs = await blogsModel.find()
-    let blog = []
-    for (let i = 0; i < blogs.length; i++) {
-      if (!blogs[i].isDeleted && blogs[i].isPublished) {
-        blog.push(blogs[i])
-      }
-    }
-    if (blog.length === 0) {
+    let blogs = await blogsModel.find({isDeleted:false,isPublished:true})
+    if (blogs.length === 0) {
       res.status(404).send({ msg: "no data" })
       return;
     }
     let id = req.query
     let filtered = [];
-    filtered = blog.filter((item) => {
+    filtered = blogs.filter((item) => {
       if (Object.keys(id).length === 0) {
         return true;
       }
@@ -124,7 +118,7 @@ const updateBlog = async function (req, res) {
       { $set: { title: title, body: body, tags: tags, subcategory: subcategory, isPublished: true, publishedAt: dateStr } },
       { new: true })
     const blogData = updatblog ?? 'Blog not found.'
-    res.status(201).send({ Status: true, Data: blogData })
+    res.status(200).send({ Status: true, Data: blogData })
   }
 
   catch (err) {
@@ -137,7 +131,7 @@ const updateBlog = async function (req, res) {
 
 const deleteblog = async function (req, res) {
   try {
-    let BlogId = req.params.BlogId;
+    let BlogId = req.params.blogId;
     let Blog = await blogsModel.findById(BlogId);
     if (!Blog) {
       return res.status(404).send({ status: false, msg: "BlogID Does not exists" });
@@ -159,13 +153,8 @@ const deleteblog = async function (req, res) {
 
 let deletedByQueryParams = async function (req, res) {
   try {
-    let token = req['x-api-key']
-    // req.headers["x-Api-key"]; //getting token from header
-    //     token = req.headers["x-api-key"];
-         let decodedToken = jwt.decode(token, "Uranium-Group-24"); //verifying token with secret key
-        
-        let loggedInUser = decodedToken.authorId;
-    const queryparams = req.query;
+       let loggedInUser = req.authorId;
+        const queryparams = req.query;
 
     if (Object.keys(queryparams).length == 0) {
       return res.status(400).send({
