@@ -49,7 +49,7 @@ const createAuthor = async function (req, res) {
         const schema = new passwordValidator();
         schema.is().min(8)
         if(!schema.validate(requestBody.password)){
-            return res.status(400).send({ status: false, data: "Minimum length of password should ne 8 characters" })
+            return res.status(400).send({ status: false, data: "Minimum length of password should be 8 characters" })
         }
         let data = await authorModel.create(req.body)
         return res.status(201).send({ status: true, data: data })

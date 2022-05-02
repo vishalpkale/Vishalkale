@@ -113,7 +113,7 @@ const updateBlog = async function (req, res) {
     let subcategory = req.body.subcategory
 
     const updatblog = await blogsModel.findOneAndUpdate(
-      { _id: blogId, isDeleted: false },
+      { _id: blogId, isDeleted: false },//filter
       { $set: { title: title, body: body, tags: tags, subcategory: subcategory, isPublished: true, publishedAt: dateStr } },
       { new: true })
     const blogData = updatblog ?? 'Blog not found.'
