@@ -45,7 +45,7 @@ const createBlog = async function (req, res) {
 
     const createdata = await blogsModel.create(requestBody)
 
-    res.status(201).send({ status: true, data: createdata })
+    res.status(201).send({ status: true,message: "Blog Created", data: createdata })
   }
   catch (error) {
     res.status(500).send({ msg: error.message })
@@ -57,7 +57,7 @@ const getBlog = async (req, res) => {
   try {
     let blogs =await blogsModel.find({isDeleted:false,isPublished:true})
     if (blogs.length === 0) {
-      res.status(404).send({ msg: "no data" })
+      res.status(404).send({ status: false, msg: "no data" })
       return;
     }
     let id = req.query
@@ -71,7 +71,7 @@ const getBlog = async (req, res) => {
       }
     })
     if (filtered.length === 0) {
-      res.status(404).send({ msg: "no data" })
+      res.status(404).send({ status: false, msg: "no data" })
       return;
     }
     res.status(200).send({ status: true, count: filtered.length, data: filtered })
