@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const authorModel = require("../Models/authorModel")
 const passwordValidator = require('password-validator');
+const emailValidator = require('email-validator')
 
 ///////////////////////////////////////////createauthor(Phase-1)//////////////////////////////////////////////////
 
@@ -41,6 +42,15 @@ const createAuthor = async function (req, res) {
                 .status(400)
                 .send({ status: false, message: "password is required" });
         }
+        let titleArr = ["Mr", "Mrs", "Ms"]
+
+        if (!titleArr.includes(title)) {
+            res.status(400).send({ status: false, msg: "Title should be Mr, Mrs or Ms" })
+        }
+
+        if (!emailValidator.validate(email)) {
+            return res.status(400).send({ status: false, msg: "Check the format of email" })
+        }
 
         let emailValidation = await authorModel.findOne({ email: email })
         if (emailValidation) {
@@ -48,7 +58,7 @@ const createAuthor = async function (req, res) {
         }
         const schema = new passwordValidator();
         schema.is().min(8)
-        if(!schema.validate(requestBody.password)){
+        if (!schema.validate(requestBody.password)) {
             return res.status(400).send({ status: false, msg: "Minimum length of password should be 8 characters" })
         }
         let data = await authorModel.create(req.body)
@@ -64,29 +74,43 @@ const createAuthor = async function (req, res) {
 ////////////////////////////////////////////authorlogin(Phase-2)/////////////////////////////////////////////////////
 
 const Authorlogin = async function (req, res) {
-  try {
-    let emailId = req.body.email;
-    let password = req.body.password;
-  
-    let auth = await authorModel.findOne({ email: emailId, password: password });
-    //console.log(auth)
-    if (!auth)
-      return res.status(400).send({
-        status: false,
-        msg: "Email or the password credentials are not correct",
-      });
-  
-    let jwttoken = jwt.sign(
-      {
-        authorId: auth._id.toString(),
-        batch: "Uranium",
-        organisation: "Backend Cohort",
-      },
-        "Uranium-Group-24"
-    );
-    //res.setHeader("x-auth-token", jwttoken);
-    res.status(200).send({ status: true, message:"logged in",  data: {token: jwttoken} });
-}
+    try {
+        let requestBody = req.body
+        let emailId = requestBody.email;
+        let password = requestBody.password;
+
+        if (Object.keys(requestBody).length == 0) {
+            return res.status(400).send({
+                status: false,
+                msg: "Please provide login details",
+            });
+        }
+        if (emailId.trim().length == 0 || password.trim().length == 0) {
+            return res.status(400).send({
+                status: false,
+                msg: "Please provide login details",
+            });
+        }
+
+        let auth1 = await authorModel.findOne({ email: emailId, password: password });
+
+        if (!auth1)
+            return res.status(401).send({
+                status: false,
+                msg: "Email or the password credentials are not correct",
+            });
+
+        let jwttoken = jwt.sign(
+            {
+                authorId: auth1._id,
+                batch: "Uranium",
+                organisation: "Backend Cohort",
+            },
+            "Uranium-Group-24"
+        );
+        //res.setHeader("x-auth-token", jwttoken);
+        res.status(200).send({ status: true, message: "logged in", data: { token: jwttoken } });
+    }
 
     catch (error) {
         return res.status(500).send({ msg: error.message })
