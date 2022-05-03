@@ -32,7 +32,7 @@ const blogSchema = new mongoose.Schema ({
         trim:true
     },
     deletedAt: {
-        type: String
+        type: Date
        
     }, 
     isDeleted: {
@@ -40,7 +40,7 @@ const blogSchema = new mongoose.Schema ({
         default: false
     },
     publishedAt: {
-        type: String
+        type: Date
         
     }, 
     isPublished: {
