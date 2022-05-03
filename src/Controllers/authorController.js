@@ -44,15 +44,15 @@ const createAuthor = async function (req, res) {
 
         let emailValidation = await authorModel.findOne({ email: email })
         if (emailValidation) {
-            return res.status(409).send({ status: false, data: "This Email has been registered already" })
+            return res.status(409).send({ status: false, msg: "This Email has been registered already" })
         }
         const schema = new passwordValidator();
         schema.is().min(8)
         if(!schema.validate(requestBody.password)){
-            return res.status(400).send({ status: false, data: "Minimum length of password should be 8 characters" })
+            return res.status(400).send({ status: false, msg: "Minimum length of password should be 8 characters" })
         }
         let data = await authorModel.create(req.body)
-        return res.status(201).send({ status: true, data: data })
+        return res.status(201).send({ status: true, message: "created", data: data })
 
     }
     catch (error) {
@@ -84,8 +84,8 @@ const Authorlogin = async function (req, res) {
       },
         "Uranium-Group-24"
     );
-    res.setHeader("x-auth-token", jwttoken);
-    res.send({ status: true,  data: jwttoken });
+    //res.setHeader("x-auth-token", jwttoken);
+    res.status(200).send({ status: true, message:"logged in",  data: {token: jwttoken} });
 }
 
     catch (error) {
